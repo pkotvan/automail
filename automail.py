@@ -129,15 +129,15 @@ def render_message(path, variables, noedit=False):
     for var in missing_vars:
         variables[var] = "{{{{ {} }}}}".format(var)
 
-    if len(missing_vars) == 0 and noedit:
+    if not missing_vars and noedit:
         logger.debug(
             "No missing vars + noedit on command line. Continue without manual edit."
         )
         return tmpl.render(variables)
-    else:
-        logger.debug("Missing variables: %s", missing_vars)
-        partial = tmpl.render(variables)
-        return edit_template(partial)
+
+    logger.debug("Missing variables: %s", missing_vars)
+    partial = tmpl.render(variables)
+    return edit_template(partial)
 
 
 def parse_message(msg):
