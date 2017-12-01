@@ -67,6 +67,11 @@ def parse_arguments(cmdline):
     parser.add_argument(
         '-t', '--template', required=True, help="Template path.")
     parser.add_argument(
+        '-l',
+        '--list',
+        action='store_true',
+        help="List template variables and exit.")
+    parser.add_argument(
         'jinja_vars',
         nargs='*',
         action=StoreDict,
@@ -199,6 +204,11 @@ if __name__ == "__main__":
     with open(os.path.expanduser(args.config)) as cfgfile:
         config.read_file(cfgfile)
     logger.debug("Host: %s", config['general']['host'])
+
+    if args.list:
+        _, tmpl_vars = load_template(args.template)
+        print("Template variables: {}".format(tmpl_vars))
+        sys.exit()
 
     message = render_message(args.template, args.jinja_vars, args.noedit)
     headers, content = parse_message(message)
