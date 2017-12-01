@@ -114,8 +114,11 @@ def edit_template(tmpl):
     return out
 
 
-def render_message(path, variables, noedit=False):
-    """Return rendered message."""
+def load_template(path):
+    """
+    Load jinja2 template and return the template object and the set of
+    variables used in the template.
+    """
     env = jinja2.Environment(
         loader=jinja2.FileSystemLoader(os.path.dirname(path)))
     tmpl = env.get_template(os.path.basename(path))
@@ -124,6 +127,13 @@ def render_message(path, variables, noedit=False):
     tmpl_src = env.loader.get_source(env, os.path.basename(path))[0]
     tmpl_vars = jinja2.meta.find_undeclared_variables(env.parse(tmpl_src))
 
+    return tmpl, tmpl_vars
+
+
+def render_message(path, variables, noedit=False):
+    """Return rendered message."""
+
+    tmpl, tmpl_vars = load_template(path)
     # Preserve undeclared variables.
     missing_vars = tmpl_vars - set(variables.keys())
     for var in missing_vars:
