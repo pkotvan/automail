@@ -179,9 +179,10 @@ def send_message(cfg, msg):
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.WARN)
+    logger = logging.getLogger(__name__)
     args = parse_arguments(sys.argv[1:])
     logging.basicConfig(level=args.debug)
-    logger = logging.getLogger(__name__)
     logger.debug("Command line arguments: %s", args)
 
     config = configparser.ConfigParser()
