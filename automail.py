@@ -212,6 +212,8 @@ if __name__ == "__main__":
     logger.debug("Host: %s", config['general']['host'])
 
     tmpl, tmpl_vars = load_template(args.template)
+
+    # List jinja variables and exit.
     if args.list:
         print("Template variables: {}".format(tmpl_vars))
         sys.exit()
@@ -223,6 +225,7 @@ if __name__ == "__main__":
     message = edit_template(tmpl.render(args.jinja_vars))
     headers, content = parse_message(message)
 
+    # Dryrun: print message headers and contents and exit.
     if args.dryrun:
         print("Message headers: \n{}\n".format(headers))
         print("Message content: \n{}".format(content))
