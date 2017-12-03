@@ -31,6 +31,9 @@ import email.message
 import jinja2
 import jinja2.meta
 
+logging.basicConfig(level=logging.WARN)
+LOGGER = logging.getLogger(__name__)
+
 
 def yes_no(question, default="yes"):
     """
@@ -76,7 +79,7 @@ class StoreDict(argparse.Action):
             try:
                 key, val = item.split('=')
             except ValueError:
-                logger.warning(
+                LOGGER.warning(
                     "Could not parse '%s'. Parameter in 'key=value' format is expected.",
                     item)
                 continue
@@ -134,7 +137,7 @@ def edit_template(template):
     path = ""
     with tempfile.NamedTemporaryFile(mode='w+t', delete=False) as tmpf:
         path = tmpf.name
-        logger.debug("Temporary file: %s", path)
+        LOGGER.debug("Temporary file: %s", path)
         tmpf.write(template)
 
     subprocess.run([os.environ["EDITOR"], path])
@@ -181,7 +184,7 @@ def parse_message(msg):
         hdrs[key.strip()] = val.strip()
     body = '\n'.join(lines[index:])
 
-    logger.debug('Message headers: %s', hdrs)
+    LOGGER.debug('Message headers: %s', hdrs)
     return hdrs, body
 
 
@@ -195,24 +198,25 @@ def send_message(cfg, msg):
     except KeyError:
         port = 0
 
-    logger.debug("Host: %s", host)
+    LOGGER.debug("Host: %s", host)
 
     srv = smtplib.SMTP(host, port=port)
     srv.send_message(msg)
     srv.quit()
 
 
-if __name__ == "__main__":
-    logging.basicConfig(level=logging.WARN)
-    logger = logging.getLogger(__name__)
+def main():
+    """
+    Main function.
+    """
     args = parse_arguments(sys.argv[1:])
     logging.basicConfig(level=args.debug)
-    logger.debug("Command line arguments: %s", args)
+    LOGGER.debug("Command line arguments: %s", args)
 
     config = configparser.ConfigParser()
     with open(os.path.expanduser(args.config)) as cfgfile:
         config.read_file(cfgfile)
-    logger.debug("Host: %s", config['general']['host'])
+    LOGGER.debug("Host: %s", config['general']['host'])
 
     tmpl, tmpl_vars = load_template(args.template)
 
@@ -249,6 +253,10 @@ if __name__ == "__main__":
     mail.set_content(content)
     for header in headers:
         mail[header] = headers[header]
-        logger.debug("Adding header: %s: %s", header, headers[header])
+        LOGGER.debug("Adding header: %s: %s", header, headers[header])
 
     send_message(config, mail)
+
+
+if __name__ == "__main__":
+    main()
