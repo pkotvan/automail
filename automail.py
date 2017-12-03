@@ -161,26 +161,6 @@ def load_template(path):
     return tmpl, vrs
 
 
-def render_message(path, variables, noedit=False):
-    """Return rendered message."""
-
-    tmpl, vrs = load_template(path)
-    # Preserve undeclared variables.
-    missing_vars = vrs - set(variables.keys())
-    for var in missing_vars:
-        variables[var] = "{{{{ {} }}}}".format(var)
-
-    if not missing_vars and noedit:
-        logger.debug(
-            "No missing vars + noedit on command line. Continue without manual edit."
-        )
-        return tmpl.render(variables)
-
-    logger.debug("Missing variables: %s", missing_vars)
-    partial = tmpl.render(variables)
-    return edit_template(partial)
-
-
 def parse_message(msg):
     """
     Parse headers and message content.
@@ -231,12 +211,16 @@ if __name__ == "__main__":
         config.read_file(cfgfile)
     logger.debug("Host: %s", config['general']['host'])
 
+    tmpl, tmpl_vars = load_template(args.template)
     if args.list:
-        _, tmpl_vars = load_template(args.template)
         print("Template variables: {}".format(tmpl_vars))
         sys.exit()
 
-    message = render_message(args.template, args.jinja_vars, args.noedit)
+    missing_vars = tmpl_vars - set(args.jinja_vars.keys())
+    for var in missing_vars:
+        args.jinja_vars[var] = "{{{{ {} }}}}".format(var)
+
+    message = edit_template(tmpl.render(args.jinja_vars))
     headers, content = parse_message(message)
     mail = email.message.EmailMessage()
     mail.set_content(content)
