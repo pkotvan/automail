@@ -222,15 +222,16 @@ if __name__ == "__main__":
 
     message = edit_template(tmpl.render(args.jinja_vars))
     headers, content = parse_message(message)
-    mail = email.message.EmailMessage()
-    mail.set_content(content)
-    for header in headers:
-        mail[header] = headers[header]
-        logger.debug("Adding header: %s: %s", header, headers[header])
 
     if args.dryrun:
         print("Message headers: \n{}\n".format(headers))
         print("Message content: \n{}".format(content))
         sys.exit()
+
+    mail = email.message.EmailMessage()
+    mail.set_content(content)
+    for header in headers:
+        mail[header] = headers[header]
+        logger.debug("Adding header: %s: %s", header, headers[header])
 
     send_message(config, mail)
