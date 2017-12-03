@@ -53,7 +53,7 @@ def yes_no(question, default="yes"):
         raise ValueError("invalid default answer: {}".format(default))
 
     while True:
-        sys.stdout.write("{} {}".format(question, prompt))
+        sys.stdout.write("{} {} ".format(question, prompt))
         choice = input().lower()
         if default is not None and choice == '':
             return valid[default]
