@@ -33,6 +33,9 @@ import jinja2.meta
 
 
 def yes_no(question, default="yes"):
+    """
+    Get yes/no input from user.
+    """
     valid = {
         "yes": True,
         "y": True,
@@ -123,7 +126,7 @@ def parse_arguments(cmdline):
     return parser.parse_args(cmdline)
 
 
-def edit_template(tmpl):
+def edit_template(template):
     """
     Edit template in editor.
     """
@@ -132,7 +135,7 @@ def edit_template(tmpl):
     with tempfile.NamedTemporaryFile(mode='w+t', delete=False) as tmpf:
         path = tmpf.name
         logger.debug("Temporary file: %s", path)
-        tmpf.write(tmpl)
+        tmpf.write(template)
 
     subprocess.run([os.environ["EDITOR"], path])
 
@@ -152,13 +155,13 @@ def load_template(path):
     """
     env = jinja2.Environment(
         loader=jinja2.FileSystemLoader(os.path.dirname(path)))
-    tmpl = env.get_template(os.path.basename(path))
+    template = env.get_template(os.path.basename(path))
 
     # Get set of variables used in template.
     src = env.loader.get_source(env, os.path.basename(path))[0]
     vrs = jinja2.meta.find_undeclared_variables(env.parse(src))
 
-    return tmpl, vrs
+    return template, vrs
 
 
 def parse_message(msg):
