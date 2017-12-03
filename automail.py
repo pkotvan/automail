@@ -32,6 +32,32 @@ import jinja2
 import jinja2.meta
 
 
+def yes_no(question, default="yes"):
+    valid = {
+        "yes": True,
+        "y": True,
+        "no": False,
+        "n": False,
+    }
+
+    if default is None:
+        prompt = "[y/n]"
+    elif default == "yes":
+        prompt = "[Y/n]"
+    elif default == "no":
+        prompt = "[y/N]"
+    else:
+        raise ValueError("invalid default answer: {}".format(default))
+
+    while True:
+        sys.stdout.write("{} {}".format(question, prompt))
+        choice = input().lower()
+        if default is not None and choice == '':
+            return valid[default]
+        elif choice in valid:
+            return valid[choice]
+
+
 class StoreDict(argparse.Action):
     """
     Custom action to store command line arguments as dictionary.
