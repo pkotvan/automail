@@ -238,7 +238,8 @@ def main():
             args.jinja_vars[var] = "{{{{ {} }}}}".format(var)
         message = edit_template(tmpl.render(args.jinja_vars))
 
-        if not yes_no("Do you really want to send the message?", "no"):
+        print(message)
+        if not yes_no("\nDo you really want to send the message?", "no"):
             sys.exit()
 
     headers, content = parse_message(message)
