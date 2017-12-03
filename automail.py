@@ -222,10 +222,21 @@ if __name__ == "__main__":
         sys.exit()
 
     missing_vars = tmpl_vars - set(args.jinja_vars.keys())
-    for var in missing_vars:
-        args.jinja_vars[var] = "{{{{ {} }}}}".format(var)
 
-    message = edit_template(tmpl.render(args.jinja_vars))
+    if args.noedit:
+        if missing_vars:
+            raise ValueError(
+                "missing jinja variables in batch mode: {}".format(
+                    missing_vars))
+        message = tmpl.render(args.jinja_vars)
+    else:
+        for var in missing_vars:
+            args.jinja_vars[var] = "{{{{ {} }}}}".format(var)
+        message = edit_template(tmpl.render(args.jinja_vars))
+
+        if not yes_no("Do you really want to send the message?", "no"):
+            sys.exit()
+
     headers, content = parse_message(message)
 
     # Dryrun: print message headers and contents and exit.
