@@ -202,23 +202,24 @@ def parse_message(msg):
     return hdrs, body
 
 
-def send_message(cfg, hst, msg):
+def send_message(cfg, srv, msg):
     """
     Send the message.
     """
-    if hst:
-        host = cfg[hst]
+    if srv:
+        server = cfg[srv]
     else:
-        host = cfg[cfg['general']['server']]
+        server = cfg[cfg['general']['server']]
 
     try:
-        port = host['port']
+        port = server['port']
     except KeyError:
         port = 0
 
-    srv = smtplib.SMTP(host['host'], port=port)
-    srv.send_message(msg)
-    srv.quit()
+    smtp = smtplib.SMTP(server['host'], port=port)
+
+    smtp.send_message(msg)
+    smtp.quit()
 
 
 def main():
