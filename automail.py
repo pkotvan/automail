@@ -119,6 +119,8 @@ def parse_arguments(cmdline):
         action='store_true',
         help="Do not edit template manually if possible.")
     parser.add_argument(
+        '-H', '--host', help="Use specific host from the config.")
+    parser.add_argument(
         '-d',
         '--debug',
         action='store_const',
@@ -188,19 +190,21 @@ def parse_message(msg):
     return hdrs, body
 
 
-def send_message(cfg, msg):
+def send_message(cfg, hst, msg):
     """
     Send the message.
     """
-    host = cfg['general']['host']
+    if hst:
+        host = cfg[hst]
+    else:
+        host = cfg[cfg['general']['default']]
+
     try:
-        port = cfg['general']['port']
+        port = host['port']
     except KeyError:
         port = 0
 
-    LOGGER.debug("Host: %s", host)
-
-    srv = smtplib.SMTP(host, port=port)
+    srv = smtplib.SMTP(host['host'], port=port)
     srv.send_message(msg)
     srv.quit()
 
@@ -216,7 +220,7 @@ def main():
     config = configparser.ConfigParser()
     with open(os.path.expanduser(args.config)) as cfgfile:
         config.read_file(cfgfile)
-    LOGGER.debug("Host: %s", config['general']['host'])
+    LOGGER.debug("Host: %s", config['general']['default'])
 
     tmpl, tmpl_vars = load_template(args.template)
 
@@ -256,7 +260,7 @@ def main():
         mail[header] = headers[header]
         LOGGER.debug("Adding header: %s: %s", header, headers[header])
 
-    send_message(config, mail)
+    send_message(config, args.host, mail)
 
 
 if __name__ == "__main__":
