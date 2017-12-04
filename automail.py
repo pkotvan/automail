@@ -223,15 +223,15 @@ def main():
     # List jinja variables and exit.
     if args.list:
         print("Template variables: {}".format(tmpl_vars))
-        sys.exit()
+        return
 
     missing_vars = tmpl_vars - set(args.jinja_vars.keys())
 
     if args.noedit:
         if missing_vars:
-            raise ValueError(
-                "missing jinja variables in batch mode: {}".format(
-                    missing_vars))
+            LOGGER.error("Missing jinja variables in batch mode: %s",
+                         missing_vars)
+            return 1
         message = tmpl.render(args.jinja_vars)
     else:
         for var in missing_vars:
@@ -240,7 +240,7 @@ def main():
 
         print(message)
         if not yes_no("\nDo you really want to send the message?", "no"):
-            sys.exit()
+            return
 
     headers, content = parse_message(message)
 
@@ -248,7 +248,7 @@ def main():
     if args.dryrun:
         print("Message headers: \n{}\n".format(headers))
         print("Message content: \n{}".format(content))
-        sys.exit()
+        return
 
     mail = email.message.EmailMessage()
     mail.set_content(content)
@@ -260,4 +260,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
