@@ -220,7 +220,7 @@ def main():
     config = configparser.ConfigParser()
     with open(os.path.expanduser(args.config)) as cfgfile:
         config.read_file(cfgfile)
-    LOGGER.debug("Host: %s", config['general']['default'])
+    LOGGER.debug("Host: %s", config['general']['server'])
 
     tmpl, tmpl_vars = load_template(args.template)
 
