@@ -115,7 +115,7 @@ def parse_arguments(cmdline):
     parser.add_argument(
         '--dryrun',
         action='store_true',
-        help="Do not send the message, just print it to stdout and exit.")
+        help="Do not send the message.")
     parser.add_argument(
         '-n',
         '--noedit',
@@ -249,22 +249,21 @@ def main():
                          missing_vars)
             return 1
         message = tmpl.render(args.jinja_vars)
+
+        # Print the message in noninteractive mode if dryrun is enabled.
+        if args.dryrun:
+            print(message)
     else:
         for var in missing_vars:
             args.jinja_vars[var] = "{{{{ {} }}}}".format(var)
         message = edit_template(tmpl.render(args.jinja_vars))
 
         print(message)
-        if not yes_no("\nDo you really want to send the message?", "no"):
-            return
+        if not args.dryrun:
+            if not yes_no("\nDo you really want to send the message?", "no"):
+                return
 
     headers, content = parse_message(message)
-
-    # Dryrun: print message headers and contents and exit.
-    if args.dryrun:
-        print("Message headers: \n{}\n".format(headers))
-        print("Message content: \n{}".format(content))
-        return
 
     mail = email.message.EmailMessage()
     mail.set_content(content)
@@ -272,7 +271,10 @@ def main():
         mail[header] = headers[header]
         LOGGER.debug("Adding header: %s: %s", header, headers[header])
 
-    send_message(config, args.server, mail)
+    if not args.dryrun:
+        send_message(config, args.server, mail)
+    else:
+        LOGGER.debug("Dry run enabled, message not sent.")
 
 
 if __name__ == "__main__":
