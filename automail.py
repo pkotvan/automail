@@ -197,7 +197,7 @@ def send_message(cfg, hst, msg):
     if hst:
         host = cfg[hst]
     else:
-        host = cfg[cfg['general']['default']]
+        host = cfg[cfg['general']['server']]
 
     try:
         port = host['port']
