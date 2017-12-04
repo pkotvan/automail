@@ -222,7 +222,7 @@ def main():
 
     # List jinja variables and exit.
     if args.list:
-        print("Template variables: {}".format(tmpl_vars))
+        print("Undefined template variables: {}".format(tmpl_vars))
         return
 
     missing_vars = tmpl_vars - set(args.jinja_vars.keys())
