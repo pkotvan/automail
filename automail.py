@@ -116,7 +116,7 @@ def parse_arguments(cmdline):
         '--dryrun', action='store_true', help="Do not send the message.")
     parser.add_argument(
         '-n',
-        '--noedit',
+        '--noninteractive',
         action='store_true',
         help="Do not edit template manually if possible.")
     parser.add_argument(
@@ -239,7 +239,7 @@ def main():
 
     missing_vars = tmpl_vars - set(args.jinja_vars.keys())
 
-    if args.noedit:
+    if args.noninteractive:
         if missing_vars:
             LOGGER.error("Missing jinja variables in batch mode: %s",
                          missing_vars)
