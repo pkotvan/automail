@@ -140,7 +140,7 @@ def edit_template(template):
         LOGGER.debug("Temporary file: %s", path)
         tmpf.write(template)
 
-    subprocess.run([os.environ["EDITOR"], path])
+    subprocess.check_call([os.environ["EDITOR"], path])
 
     with open(path, 'rt') as tmpf:
         tmpf.seek(0)
