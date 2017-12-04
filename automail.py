@@ -34,6 +34,9 @@ import jinja2.meta
 logging.basicConfig(level=logging.WARN)
 LOGGER = logging.getLogger(__name__)
 
+# Dictionary with default configuration values.
+CONFIG_DEFAULTS = {'starttls': 'yes'}
+
 
 def yes_no(question, default="yes"):
     """
@@ -153,6 +156,17 @@ def edit_template(template):
     return out
 
 
+def load_config(path):
+    """
+    Load configuration file and add default values.
+    """
+    cfg = configparser.ConfigParser()
+    cfg['DEFAULT'] = CONFIG_DEFAULTS
+    with open(os.path.expanduser(path)) as cfgfile:
+        cfg.read_file(cfgfile)
+    return cfg
+
+
 def load_template(path):
     """
     Load jinja2 template and return the template object and the set of
@@ -217,9 +231,7 @@ def main():
     logging.basicConfig(level=args.debug)
     LOGGER.debug("Command line arguments: %s", args)
 
-    config = configparser.ConfigParser()
-    with open(os.path.expanduser(args.config)) as cfgfile:
-        config.read_file(cfgfile)
+    config = load_config(args.config)
     LOGGER.debug("Host: %s", config['general']['server'])
 
     tmpl, tmpl_vars = load_template(args.template)
