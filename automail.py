@@ -122,7 +122,7 @@ def parse_arguments(cmdline):
         action='store_true',
         help="Do not edit template manually if possible.")
     parser.add_argument(
-        '-H', '--host', help="Use specific host from the config.")
+        '-s', '--server', help="Use specific server from the config.")
     parser.add_argument(
         '-d',
         '--debug',
