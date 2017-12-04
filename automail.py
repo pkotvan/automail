@@ -272,7 +272,7 @@ def main():
         mail[header] = headers[header]
         LOGGER.debug("Adding header: %s: %s", header, headers[header])
 
-    send_message(config, args.host, mail)
+    send_message(config, args.server, mail)
 
 
 if __name__ == "__main__":
