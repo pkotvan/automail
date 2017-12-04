@@ -3,7 +3,11 @@ automail
 
 This is a simple script for sending mails rendered from templates.
 
-The default config location is `~/.automailrc`. Configuration file example:
+The default config location is `~/.automailrc`. Multiple servers can by defined
+while the default is set in `[general]` section. For other servers use
+`-s/--server` Default value for starttls is yes.
+
+Configuration file example:
 
     [general]
     server = foobar
@@ -11,6 +15,7 @@ The default config location is `~/.automailrc`. Configuration file example:
     [foobar]
     host = <smtp host>
     port = <smtp port>
+    starttls = yes
 
 Example template:
 
