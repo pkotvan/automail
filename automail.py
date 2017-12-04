@@ -113,9 +113,7 @@ def parse_arguments(cmdline):
         metavar='template_variable=variable_value',
         help="Template variables like 'name=john'")
     parser.add_argument(
-        '--dryrun',
-        action='store_true',
-        help="Do not send the message.")
+        '--dryrun', action='store_true', help="Do not send the message.")
     parser.add_argument(
         '-n',
         '--noedit',
