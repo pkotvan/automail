@@ -228,12 +228,10 @@ def main():
     Main function.
     """
     args = parse_arguments(sys.argv[1:])
-    logging.basicConfig(level=args.debug)
+    LOGGER.setLevel(args.debug)
     LOGGER.debug("Command line arguments: %s", args)
 
     config = load_config(args.config)
-    LOGGER.debug("Host: %s", config['general']['server'])
-
     tmpl, tmpl_vars = load_template(args.template)
 
     # List jinja variables and exit.
