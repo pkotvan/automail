@@ -216,7 +216,11 @@ def send_message(cfg, srv, msg):
     except KeyError:
         port = 0
 
+    LOGGER.debug("Connecting to %s", server["host"])
     smtp = smtplib.SMTP(server['host'], port=port)
+    if server['starttls']:
+        LOGGER.debug("Use starttls.")
+        smtp.starttls()
 
     smtp.send_message(msg)
     smtp.quit()
