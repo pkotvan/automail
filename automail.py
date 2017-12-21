@@ -121,6 +121,7 @@ def parse_arguments(cmdline):
         help="Do not edit template manually if possible.")
     parser.add_argument(
         '-s', '--server', help="Use specific server from the config.")
+    parser.add_argument('-S', '--signature', help="Path to signature text.")
     parser.add_argument(
         '-d',
         '--debug',
@@ -226,6 +227,14 @@ def send_message(cfg, srv, msg):
     smtp.quit()
 
 
+def add_signature(sigpath, msg):
+    """
+    Add signature to the message.
+    """
+    with open(sigpath) as sig:
+        return msg + '\n' + sig.read()
+
+
 def main():
     """
     Main function.
@@ -250,7 +259,11 @@ def main():
             LOGGER.error("Missing jinja variables in noninteractive mode: %s",
                          missing_vars)
             return 1
-        message = tmpl.render(args.jinja_vars)
+        if args.signature:
+            message = add_signature(args.signature, tmpl.render(
+                args.jinja_vars))
+        else:
+            message = tmpl.render(args.jinja_vars)
 
         # Print the message in noninteractive mode if dryrun is enabled.
         if args.dryrun:
@@ -258,7 +271,12 @@ def main():
     else:
         for var in missing_vars:
             args.jinja_vars[var] = "{{{{ {} }}}}".format(var)
-        message = edit_template(tmpl.render(args.jinja_vars))
+
+        if args.signature:
+            message = edit_template(
+                add_signature(args.signature, tmpl.render(args.jinja_vars)))
+        else:
+            message = edit_template(tmpl.render(args.jinja_vars))
 
         print(message)
         if not args.dryrun:
