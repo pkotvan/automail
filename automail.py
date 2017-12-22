@@ -35,7 +35,7 @@ logging.basicConfig(level=logging.WARN)
 LOGGER = logging.getLogger(__name__)
 
 # Dictionary with default configuration values.
-CONFIG_DEFAULTS = {'starttls': 'yes'}
+CONFIG_DEFAULTS = {'starttls': 'yes', 'port': '0'}
 
 
 def yes_no(question, default="yes"):
@@ -115,11 +115,25 @@ def parse_arguments(cmdline):
         help="Do not edit template manually if possible.")
     parser.add_argument(
         '-s', '--server', help="Use specific server from the config.")
+    parser.add_argument(
+        '-p', '--port', type=int, default=0, help="Use specific port.")
 
     # Arguments with only long option strings.
     parser.add_argument('--signature', help="Path to signature text.")
     parser.add_argument(
         '--dryrun', action='store_true', help="Do not send the message.")
+    parser.add_argument(
+        '--starttls',
+        action='store_true',
+        default=None,
+        help="Put the SMTP connection in TLS (Transport Layer Security) mode.")
+    parser.add_argument(
+        '--nostarttls',
+        action='store_false',
+        dest='starttls',
+        default=None,
+        help="Do not use STARTTLS (default).")
+    parser.add_argument('--host', help="Server address.")
 
     parser.add_argument(
         '-d',
@@ -212,23 +226,13 @@ def parse_message(msg):
     return hdrs, body
 
 
-def send_message(cfg, srv, msg):
+def send_message(arg, msg):
     """
     Send the message.
     """
-    if srv:
-        server = cfg[srv]
-    else:
-        server = cfg[cfg['general']['server']]
-
-    try:
-        port = server['port']
-    except KeyError:
-        port = 0
-
-    LOGGER.debug("Connecting to %s", server["host"])
-    smtp = smtplib.SMTP(server['host'], port=port)
-    if server['starttls']:
+    LOGGER.debug("Connecting to %s", arg.host)
+    smtp = smtplib.SMTP(arg.host, port=arg.port)
+    if arg.starttls:
         LOGGER.debug("Use starttls.")
         smtp.starttls()
 
@@ -244,6 +248,27 @@ def add_signature(sigpath, msg):
         return msg + '\n' + sig.read()
 
 
+def apply_cfg(arg):
+    """
+    Apply configuration.
+    """
+    cfg = load_config(arg.config)
+
+    if not arg.server:
+        arg.server = cfg['general']['server']
+
+    if arg.starttls is None:
+        arg.starttls = cfg[arg.server].getboolean('starttls')
+
+    if not arg.host:
+        arg.host = cfg[arg.server]['host']
+
+    if not arg.port:
+        arg.port = cfg[arg.server].getint('port')
+
+    return arg
+
+
 def main():
     """
     Main function.
@@ -251,8 +276,9 @@ def main():
     args = parse_arguments(sys.argv[1:])
     LOGGER.setLevel(args.debug)
     LOGGER.debug("Command line arguments: %s", args)
+    apply_cfg(args)
+    LOGGER.debug("Configuration applied: %s", args)
 
-    config = load_config(args.config)
     tmpl, tmpl_vars = load_template(args.template)
 
     # List jinja variables and exit.
@@ -301,7 +327,7 @@ def main():
         LOGGER.debug("Adding header: %s: %s", header, headers[header])
 
     if not args.dryrun:
-        send_message(config, args.server, mail)
+        send_message(args, mail)
     else:
         LOGGER.debug("Dry run enabled, message not sent.")
 
