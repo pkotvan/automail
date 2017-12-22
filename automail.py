@@ -126,13 +126,14 @@ def parse_arguments(cmdline):
         '--starttls',
         action='store_true',
         default=None,
-        help="Put the SMTP connection in TLS (Transport Layer Security) mode.")
+        help=
+        "Put the SMTP connection in TLS (Transport Layer Security). Default.")
     parser.add_argument(
         '--nostarttls',
         action='store_false',
         dest='starttls',
         default=None,
-        help="Do not use STARTTLS (default).")
+        help="Do not use STARTTLS.")
     parser.add_argument('--host', help="Server address.")
 
     parser.add_argument(
