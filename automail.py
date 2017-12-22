@@ -94,6 +94,8 @@ def parse_arguments(cmdline):
     """Parse command line arguments."""
     parser = argparse.ArgumentParser(
         description="Send emails generated from templates.")
+
+    # Arguments with both short and long option strings.
     parser.add_argument(
         '-c',
         '--config',
@@ -107,21 +109,18 @@ def parse_arguments(cmdline):
         action='store_true',
         help="List template variables and exit.")
     parser.add_argument(
-        'jinja_vars',
-        nargs='*',
-        action=StoreDict,
-        metavar='template_variable=variable_value',
-        help="Template variables like 'name=john'")
-    parser.add_argument(
-        '--dryrun', action='store_true', help="Do not send the message.")
-    parser.add_argument(
         '-n',
         '--noninteractive',
         action='store_true',
         help="Do not edit template manually if possible.")
     parser.add_argument(
         '-s', '--server', help="Use specific server from the config.")
-    parser.add_argument('-S', '--signature', help="Path to signature text.")
+
+    # Arguments with only long option strings.
+    parser.add_argument('--signature', help="Path to signature text.")
+    parser.add_argument(
+        '--dryrun', action='store_true', help="Do not send the message.")
+
     parser.add_argument(
         '-d',
         '--debug',
@@ -129,6 +128,16 @@ def parse_arguments(cmdline):
         const=logging.DEBUG,
         default=logging.WARN,
         help="Turn on debug output.")
+
+    # Positional arguments are parsed with custom action defined by StoreDict
+    # class. All positional arguments are used to replate jinja variables used
+    # in templates.
+    parser.add_argument(
+        'jinja_vars',
+        nargs='*',
+        action=StoreDict,
+        metavar='template_variable=variable_value',
+        help="Template variables like 'name=john'")
 
     return parser.parse_args(cmdline)
 
