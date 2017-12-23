@@ -291,7 +291,7 @@ def main():
         return
 
     missing_vars = tmpl_vars - set(args.jinja_vars.keys())
-    LOGGER.debug("Missing variables: %s", missing_vars)
+    LOGGER.debug("Missing variables: %s", list(missing_vars))
 
     if args.noninteractive:
         if missing_vars:
