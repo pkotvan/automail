@@ -253,19 +253,22 @@ def apply_cfg(arg):
     """
     Apply configuration.
     """
+    LOGGER.debug("Loading configuration file: %s", arg.config)
     cfg = load_config(arg.config)
 
     if not arg.server:
         arg.server = cfg['general']['server']
 
+    srvcfg = cfg[arg.server]
+
     if arg.starttls is None:
-        arg.starttls = cfg[arg.server].getboolean('starttls')
+        arg.starttls = srvcfg.getboolean('starttls')
 
     if not arg.host:
-        arg.host = cfg[arg.server]['host']
+        arg.host = srvcfg['host']
 
     if not arg.port:
-        arg.port = cfg[arg.server].getint('port')
+        arg.port = srvcfg.getint('port')
 
     return arg
 
