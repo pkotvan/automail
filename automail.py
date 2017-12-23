@@ -270,6 +270,12 @@ def apply_cfg(arg):
     if not arg.port:
         arg.port = srvcfg.getint('port')
 
+    if not arg.signature:
+        try:
+            arg.signature = srvcfg['signature']
+        except KeyError:
+            pass
+
     return arg
 
 
