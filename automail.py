@@ -245,7 +245,7 @@ def add_signature(sigpath, msg):
     """
     Add signature to the message.
     """
-    with open(sigpath) as sig:
+    with open(os.path.expanduser(sigpath)) as sig:
         return msg + '\n' + sig.read()
 
 
