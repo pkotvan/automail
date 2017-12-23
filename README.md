@@ -15,7 +15,8 @@ Configuration file example:
     [foobar]
     host = <smtp host>
     port = <smtp port>
-    starttls = yes
+    starttls = <yes/no>
+    signature = <path to signature file>
 
 Example template:
 
