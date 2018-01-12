@@ -18,6 +18,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
+__version__ = '0.3'
+
 import sys
 import os
 import os.path
@@ -30,8 +32,6 @@ import smtplib
 import email.message
 import jinja2
 import jinja2.meta
-
-VERSION = '0.3'
 
 logging.basicConfig(level=logging.WARN)
 LOGGER = logging.getLogger(__name__)
@@ -337,7 +337,7 @@ def main():
     for header in headers:
         mail[header] = headers[header]
         LOGGER.debug("Adding header: %s: %s", header, headers[header])
-    mail["User-Agent"] = "Automail/{}".format(VERSION)
+    mail["User-Agent"] = "Automail/{}".format(__version__)
 
     if not args.dryrun:
         send_message(args, mail)
