@@ -221,7 +221,8 @@ def parse_message(msg):
         if line == '':
             break
         index += 1
-        key, val = line.split(':')
+        LOGGER.debug("Input: %s", line)
+        key, val = line.split(':', maxsplit=1)
         hdrs[key.strip()] = val.strip()
     body = '\n'.join(lines[index:])
 
